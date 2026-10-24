@@ -1,0 +1,7 @@
+eclipse-sumo
+traci
+sumolib
+gymnasium
+stable-baselines3
+tensorboard
+numpy

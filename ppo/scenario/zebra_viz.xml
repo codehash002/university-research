@@ -1,0 +1,18 @@
+<!-- Visual-only white zebra stripes at the single J2 south-arm crosswalk.
+     Does not change traffic logic — just makes the crossing easy to see in SUMO-GUI. -->
+<additional>
+    <!-- Classic zebra: short white bars across the south approach of J2 -->
+    <poly id="zebra_0" type="crossing" color="255,255,255" fill="1" layer="5" lineWidth="0.1"
+          shape="740.5,235.5 759.5,235.5 759.5,236.3 740.5,236.3"/>
+    <poly id="zebra_1" type="crossing" color="255,255,255" fill="1" layer="5" lineWidth="0.1"
+          shape="740.5,236.9 759.5,236.9 759.5,237.7 740.5,237.7"/>
+    <poly id="zebra_2" type="crossing" color="255,255,255" fill="1" layer="5" lineWidth="0.1"
+          shape="740.5,238.3 759.5,238.3 759.5,239.1 740.5,239.1"/>
+    <poly id="zebra_3" type="crossing" color="255,255,255" fill="1" layer="5" lineWidth="0.1"
+          shape="740.5,239.7 759.5,239.7 759.5,240.5 740.5,240.5"/>
+    <!-- Yellow edge markers so it stands out from the grey junction -->
+    <poly id="zebra_edge_s" type="crossing" color="255,200,0" fill="1" layer="4" lineWidth="0.1"
+          shape="740.0,235.2 760.0,235.2 760.0,235.5 740.0,235.5"/>
+    <poly id="zebra_edge_n" type="crossing" color="255,200,0" fill="1" layer="4" lineWidth="0.1"
+          shape="740.0,240.5 760.0,240.5 760.0,240.8 740.0,240.8"/>
+</additional>

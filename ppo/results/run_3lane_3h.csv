@@ -1,0 +1,5 @@
+controller,avg_wait,avg_queue,vehicles_finished
+AI (PPO),4608.57,149.61,1537.9
+SUMO built-in timing,12144.07,150.17,1489.1
+Fixed 30 s cycle,35601.3,262.19,1144.8
+Random lights,45610.02,293.3,1057.8

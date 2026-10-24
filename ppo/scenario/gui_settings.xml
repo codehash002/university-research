@@ -1,0 +1,19 @@
+<viewsettings>
+    <scheme name="real world"/>
+    <viewport zoom="280" x="250" y="140"/>
+    <delay value="100"/>
+    <vehicles vehicleMode="0"
+              vehicleQuality="2"
+              minVehicleSize="2.0"
+              vehicleNameShow="0"
+              showBlinker="1"
+              vehicleDetail="1"
+              showBikeMarker="1"/>
+    <junctions junctionMode="0"
+               drawLinkTLIndex="0"
+               drawCrossingsAndWalkingareas="1"
+               crossingMode="0"
+               crossingWidth="4"
+               showSizeLegend="0"/>
+    <legend showSizeLegend="1"/>
+</viewsettings>

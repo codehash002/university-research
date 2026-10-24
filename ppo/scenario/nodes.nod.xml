@@ -1,0 +1,18 @@
+<nodes>
+  <node id="W" x="-500.0" y="0" type="dead_end"/>
+  <node id="J5" x="-250.0" y="0" type="traffic_light"/>
+  <node id="J1" x="0" y="0" type="traffic_light"/>
+  <node id="J2" x="250.0" y="0" type="traffic_light"/>
+  <node id="J3" x="500.0" y="0" type="traffic_light"/>
+  <node id="J4" x="750.0" y="0" type="traffic_light"/>
+  <node id="E" x="1000.0" y="0" type="dead_end"/>
+  <node id="N5" x="-250.0" y="250.0" type="dead_end"/>
+  <node id="N1" x="0" y="250.0" type="dead_end"/>
+  <node id="S1" x="0" y="-250.0" type="dead_end"/>
+  <node id="N2" x="250.0" y="250.0" type="dead_end"/>
+  <node id="S2" x="250.0" y="-250.0" type="dead_end"/>
+  <node id="N3" x="500.0" y="250.0" type="dead_end"/>
+  <node id="S3" x="500.0" y="-250.0" type="dead_end"/>
+  <node id="S4" x="750.0" y="-250.0" type="dead_end"/>
+  <node id="CW" x="250.0" y="137.5" type="traffic_light"/>
+</nodes>
