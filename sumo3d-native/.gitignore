@@ -1,0 +1,3 @@
+# Local Rust build output (prebuilt viewer lives in bin/)
+/target/
+/target-*/

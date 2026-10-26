@@ -1,154 +1,168 @@
 # Traffic AI Projects
 
-Shared repo for traffic-control experiments. Each project lives in its own folder.
+Shared monorepo for traffic-control experiments. Each project lives in its own folder.
 
 | Folder | Status | Description |
 |--------|--------|-------------|
 | [`ppo/`](ppo/) | Ready | PPO agent that controls traffic lights in SUMO |
+| [`sumo3d/`](sumo3d/) | Ready | TraCI WebSocket bridge (GUI/headless + optional PPO) |
+| [`sumo3d-native/`](sumo3d-native/) | Ready | Native GPU 3D control hub + approach cameras (prebuilt `.exe`) |
 | `decision-model/` | Coming soon | Decision-model experiments |
 
 ---
 
 ## Prerequisites
 
+- **Windows** (3D viewer ships as a Windows `.exe`)
 - **Python 3.10+**
-- **[SUMO](https://eclipse.dev/sumo/)** (traffic simulator) installed and on your `PATH`
-  - After install, set `SUMO_HOME` to the SUMO install directory (e.g. `C:\Program Files (x86)\Eclipse\Sumo`)
+- **[SUMO](https://eclipse.dev/sumo/)** installed and on your `PATH`
+  - Set `SUMO_HOME` to the SUMO install directory (e.g. `C:\Program Files (x86)\Eclipse\Sumo`)
   - Check: `sumo --version`
+- A GPU/driver that can run Vulkan (Intel UHD / NVIDIA / AMD are fine)
+
+You do **not** need Rust. The 3D app is the prebuilt binary in `sumo3d-native/bin/`.
 
 ---
 
-## Clone and set up
+## Clone
 
-```bash
+```powershell
 git clone <REPO_URL>
 cd <repo-name>
 ```
 
-### PPO project
+---
 
-```bash
-cd ppo
+## One-time setup (venv + bridge deps)
 
-# Create and activate a virtual environment
-python -m venv venv
+The native viewer starts the Python TraCI bridge for you. Install bridge deps once:
 
-# Windows (PowerShell)
+```powershell
+cd sumo3d
+
+# Create venv
+py -3 -m venv venv
+
+# Activate (PowerShell)
 .\venv\Scripts\Activate.ps1
 
-# Windows (cmd)
-venv\Scripts\activate.bat
+# Install bridge + optional PPO controller deps
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m pip install -r ..\ppo\requirements.txt
 
-# macOS / Linux
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
+cd ..
 ```
 
-> `venv/` and `__pycache__/` are gitignored — each teammate creates their own venv.
+> `venv/` is gitignored — each teammate creates their own.
+
+If PowerShell blocks activation:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
 
 ---
 
-## PPO quick start
+## Run the 3D hub (main workflow)
+
+With SUMO installed and the `sumo3d` venv created as above:
+
+```powershell
+.\sumo3d-native\bin\sumo3d-native.exe
+```
+
+In the app:
+
+1. **Left panel — SUMO 3D Control**
+   - Pick a **route** (`ppo/scenario/routes_*.rou.xml`)
+   - Pick a **controller**: Built-in SUMO TLS, or a PPO `.zip` under `ppo/models/`
+   - Pick **SUMO-GUI** or **Headless**
+   - Pick **3D models (GLB)** or **Boxes** for vehicles
+   - Click **Start**
+2. **Center** — free-look 3D map (LMB orbit · RMB pan · scroll zoom · WASD · Q/E height · Space pause)
+3. **Right panel — Approach cameras** — live gantry-top feeds into incoming traffic; toggle per camera or All on/off
+
+Collapse either side panel with the ◀ / ▶ buttons when you want more map space.
+
+The hub launches `sumo3d/server.py` with the venv Python automatically. With **SUMO-GUI** selected, SUMO opens in a second window on the same simulation.
+
+More detail: [`sumo3d-native/README.md`](sumo3d-native/README.md).
+
+---
+
+## PPO project (train / evaluate)
+
+```powershell
+cd ppo
+
+py -3 -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
 
 All commands below assume you are inside `ppo/` with the venv activated.
 
-### 1. Build the scenario (network + traffic)
+### Build scenario (if needed)
 
-Skip if `scenario/net.net.xml` and route files already exist.
-
-```bash
+```powershell
 python make_scenario.py --lanes 3 --n-routes 60
 ```
 
-Regenerate only traffic (keep the network):
+Demand only (keep network):
 
-```bash
+```powershell
 python make_scenario.py --demand-only --n-routes 60
 ```
 
-### 2. Train
+### Train
 
-By wall-clock hours:
-
-```bash
+```powershell
 python train.py --hours 3 --run-name run_3lane_3h
-```
-
-Or by timesteps:
-
-```bash
+# or
 python train.py --timesteps 500000 --run-name my_run
 ```
 
-Models are saved under `models/<run-name>/` (`best_model.zip`, `final.zip`, checkpoints). TensorBoard logs go to `runs/`.
+Models land in `models/<run-name>/`. TensorBoard logs in `runs/`.
 
-### 3. Evaluate (PPO vs baselines)
+### Evaluate / demo
 
-```bash
+```powershell
 python evaluate.py --model models/run_3lane_3h/best_model.zip --csv results/run_3lane_3h.csv
-```
-
-Prints average wait, queue, and finished vehicles for:
-
-- AI (PPO)
-- SUMO built-in timing
-- Fixed 30 s cycle
-- Random lights
-
-### 4. Demo in SUMO-GUI
-
-Watch the trained agent:
-
-```bash
 python demo.py --model models/run_3lane_3h/best_model.zip --route 50
-```
-
-SUMO built-in controller only (no AI):
-
-```bash
 python preview.py --route 50
-```
-
-Side-by-side (PPO + built-in):
-
-```bash
 python compare_gui.py --model models/run_3lane_3h/best_model.zip --route 50
 ```
 
-### 5. Full pipeline (build → train → evaluate → optional demo)
+Full pipeline:
 
-```bash
+```powershell
 python run_all.py --hours 3 --run-name run_3lane_3h --demo
 ```
 
----
-
-## PPO layout
+### PPO layout
 
 ```
 ppo/
-├── make_scenario.py   # Build network + route files
-├── train.py           # Train PPO
-├── evaluate.py        # Compare vs baselines
-├── demo.py            # Run PPO in SUMO-GUI
-├── preview.py         # SUMO built-in GUI (no AI)
-├── compare_gui.py     # PPO vs built-in side by side
-├── run_all.py         # End-to-end pipeline
-├── traffic_env.py     # Gymnasium / SUMO environment
+├── make_scenario.py
+├── train.py
+├── evaluate.py
+├── demo.py / preview.py / compare_gui.py
+├── run_all.py
+├── traffic_env.py
 ├── requirements.txt
 ├── scenario/          # Network + traffic demand
 ├── models/            # Trained checkpoints
-├── results/           # Evaluation CSVs
-└── runs/              # TensorBoard logs
+├── results/           # Evaluation CSVs (gitignored)
+└── runs/              # TensorBoard logs (gitignored)
 ```
 
 ---
 
 ## Tips
 
-- Always **activate the venv** before running scripts.
-- Run scripts from inside `ppo/` so relative paths (`scenario/`, `models/`) resolve correctly.
-- Training can take a long time; start with a short run (`--hours 0.1` or fewer `--timesteps`) to verify setup.
-- View training curves: `tensorboard --logdir runs`
+- Always **activate the matching venv** before running Python scripts by hand.
+- Run PPO scripts from inside `ppo/` so `scenario/` and `models/` paths resolve.
+- For a quick setup check, use a short train (`--hours 0.1`) before a long run.
+- Training curves: `tensorboard --logdir runs` (from `ppo/` with venv on).
+- If the 3D window fails to start the bridge, confirm `sumo3d\venv` exists and `sumo --version` works.

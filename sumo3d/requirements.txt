@@ -1,0 +1,6 @@
+traci
+sumolib
+aiohttp
+numpy
+gymnasium
+stable-baselines3

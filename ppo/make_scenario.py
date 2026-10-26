@@ -1,6 +1,8 @@
 """Build the 5-junction SUMO network and random traffic files.
 
-Layout (3 lanes/dir: right / straight / left). Mid-block zebra at CW on N2→J2:
+Left-hand traffic (Sri Lanka / UK style).
+Layout (3 lanes/dir, lane 0 = leftmost: left / straight / right).
+Mid-block zebra at CW on N2→J2:
 
                  N5        N1        N2        N3
                   |         |         |         |
@@ -87,38 +89,43 @@ def _movement(a, b, c):
 
 
 def lane_roles(moves, lanes):
+    """Assign turn movements to lanes for left-hand traffic (lane 0 = leftmost)."""
     has = set(moves)
     roles = {l: set() for l in range(lanes)}
     if lanes >= 3 and "straight" in has and "right" in has and "left" in has:
-        roles[0] = {"right"}
+        roles[0] = {"left"}
         for l in range(1, lanes - 1):
             roles[l] = {"straight"}
-        roles[lanes - 1] = {"left"}
+        roles[lanes - 1] = {"right"}
         return roles
     if lanes == 2:
         if "straight" in has:
-            roles[0].add("straight"); roles[1].add("straight")
-        if "right" in has:
-            roles[0].add("right")
+            roles[0].add("straight")
+            roles[1].add("straight")
         if "left" in has:
-            roles[1].add("left")
+            roles[0].add("left")
+        if "right" in has:
+            roles[1].add("right")
         if "straight" not in has and "right" in has and "left" in has:
-            roles[0] = {"right"}; roles[1] = {"left"}
+            roles[0] = {"left"}
+            roles[1] = {"right"}
         elif not any(roles.values()):
-            m = next(iter(has)); roles[0].add(m); roles[1].add(m)
+            m = next(iter(has))
+            roles[0].add(m)
+            roles[1].add(m)
         return roles
     if "straight" in has:
         for l in range(lanes):
             roles[l].add("straight")
-        if "right" in has:
-            roles[0] = {"right"}
         if "left" in has:
-            roles[lanes - 1] = {"left"}
+            roles[0] = {"left"}
+        if "right" in has:
+            roles[lanes - 1] = {"right"}
     else:
         half = max(1, lanes // 2)
         for l in range(lanes):
             if "right" in has and "left" in has:
-                roles[l] = {"right" if l < half else "left"}
+                roles[l] = {"left" if l < half else "right"}
             else:
                 roles[l] = {next(iter(has))}
     return roles
@@ -175,11 +182,13 @@ def build_network(out, lanes):
                     "--node-files", os.path.join(out, "nodes.nod.xml"),
                     "--edge-files", os.path.join(out, "edges.edg.xml"),
                     "--connection-files", os.path.join(out, "cons.con.xml"),
+                    "--lefthand", "true",
                     "--no-turnarounds", "true",
                     "--no-warnings", "true",
                     "--tls.guess-signals", "true",
                     "-o", os.path.join(out, "net.net.xml")], check=True)
-    print(f"Network: {lanes} lanes/dir. Mid-block zebra at {CROSSWALK_NODE} on {e1}/{e2}.")
+    print(f"Network: {lanes} lanes/dir, LEFT-HAND traffic. "
+          f"Mid-block zebra at {CROSSWALK_NODE} on {e1}/{e2}.")
 
 
 def compute_phases(out):

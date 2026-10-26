@@ -1,9 +1,57 @@
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
 
-# Virtual environment
+# Virtual environments
 venv/
 .venv/
 env/
+
+# Pytest / coverage / type checkers
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
+.cache/
+
+# PPO training artifacts (keep scenario + shared models in git as needed)
+ppo/runs/
+ppo/results/
+ppo/**/__pycache__/
+
+# SUMO 3D bridge local venv (if created under sumo3d/)
+sumo3d/venv/
+sumo3d/.venv/
+
+# Rust / Bevy build tree (ship prebuilt binary from sumo3d-native/bin/)
+sumo3d-native/target/
+sumo3d-native/target-*/
+**/Cargo.lock.bak
+
+# Large local dumps
+*.zip.bak
+*.bak
